@@ -1,12 +1,11 @@
-
 class Pessoa(object):
-    def __init__(self, nome, endereco):
-        self.nome = nome
-        self.enderece = endereco
+    def __init__(self, name, address):
+        self.nome = name
+        self.enderece = address
 
-    def alterar(self, nome, endereco):
-        self.nome = nome
-        self.enderece = endereco
+    def alterar(self, name, address):
+        self.nome = name
+        self.enderece = address
 
     def remover(self):
         self.nome = None
@@ -14,15 +13,15 @@ class Pessoa(object):
 
 
 class Cliente(Pessoa):
-    def __init__(self, nome, endereco,  rg, data_nascimento):
-        self.rg = rg
-        self.data_nascimento = data_nascimento
-        super().__init__(nome, endereco)
+    def __init__(self, name, address, reg, date_nascimento):
+        self.rg = reg
+        self.data_nascimento = date_nascimento
+        super().__init__(name, address)
 
-    def alterar_cli(self, rg, data_nascimento, nome, endereco):
-        self.rg = rg
-        self.data_nascimento = data_nascimento
-        super().alterar(nome, endereco)
+    def alterar_cli(self, reg, date_nascimento, name, address):
+        self.rg = reg
+        self.data_nascimento = date_nascimento
+        super().alterar(name, address)
 
     def remover_cli(self):
         self.nome = None
@@ -31,15 +30,15 @@ class Cliente(Pessoa):
 
 
 class Produto:
-    def __init__(self, codigo, nome, valor):
-        self.codigo = codigo
-        self.nome = nome
-        self.valor = valor
+    def __init__(self, code, name, value):
+        self.codigo = code
+        self.nome = name
+        self.valor = value
 
-    def alterar_prod(self, codigo, nome, valor):
-        self.codigo = codigo
-        self.nome = nome
-        self.valor = valor
+    def alterar_prod(self, code, name, value):
+        self.codigo = code
+        self.nome = name
+        self.valor = value
 
     def remover_prod(self):
         self.codigo = None
@@ -48,25 +47,39 @@ class Produto:
 
 
 class Totalizavel:
-    def total(self):
-        pass
 
+    def total(self, value, quantity):
+        total = value * quantity
+        return total
 
-class Venda(Totalizavel):
-    def __init__(self, numero, data, cliente:Cliente, itens:[]):
-        self.numero = numero
-        self.data = data
-        self.cliente = cliente
-        self.itens = itens
-        super().__init__()
+    def soma(self, value, quantity):
+        total = value + quantity
+        return total
 
 
 class ItemVenda(Totalizavel):
-    def __init__(self, produto:Produto, valor, quantidade):
-        self.produto = produto
-        self.valor = valor
-        self.quantidade = quantidade
-        super().__init__()
+    def __init__(self, product: Produto, quantity):
+        self.produto = product
+        self.quantidade = quantity
+        self.valor = super().total(produto.valor, quantidade)
+
+
+class Venda(Totalizavel):
+    def __init__(self, number, date, client: Cliente, itens: []):
+        self.numero = number
+        self.data = date
+        self.cliente = client
+        self.itens = itens
+        total = 0
+        for ele in itens:
+            total += super().soma(ele.quantidade, ele.valor)
+        self.total = total
+
+    def remover_venda(self):
+        self.numero = None
+        self.data = None
+        self.cliente = None
+        self.itens = None
 
 
 print("Bem vindos !!!")
@@ -74,16 +87,19 @@ print("Bem vindos !!!")
 Pessoas = []
 Clientes = []
 Produtos = []
+Vendas = []
 while True:
-    print("1-Pessoa \n2-Cliente \n3-Produto \n4-Totalizavel \n5-Venda \n6-ItemVenda")
+    print('------------------Menu inicial------------------')
+    print("1-Pessoa \n2-Cliente \n3-Produto \n4-Venda")
     cod = int(input("Qual entidade você quer manipular:"))
     if cod == 1:
+        print('------------------Menu Pessoas------------------')
         print("1-Cadastrar uma pessoa \n2-Visualizar uma pessoa \n3-Alterar uma pessoa \n4-Excluir uma pessoa")
         cod = int(input("O que deseja fazer: "))
         if cod == 1:
-            name = str(input('Digite o nome da pessoa: '))
+            nome = str(input('Digite o nome da pessoa: '))
             endereco = str(input('Digite o endereco da pessoa: '))
-            pessoa = Pessoa(name, endereco)
+            pessoa = Pessoa(nome, endereco)
             Pessoas.append(pessoa)
 
         elif cod == 2:
@@ -117,14 +133,15 @@ while True:
 
     #  Cliente
     elif cod == 2:
+        print('------------------Menu Clientes------------------')
         print("1-Cadastrar um cliente \n2-Visualizar um cliente \n3-Alterar um cliente \n4-Excluir um cliente")
         cod = int(input("O que deseja fazer: "))
         if cod == 1:
-            name = str(input('Digite o nome do cliente: '))
+            nome = str(input('Digite o nome do cliente: '))
             endereco = str(input('Digite o endereço do cliente: '))
             rg = str(input('Digite o rg do cliente: '))
             data_nascimento = str(input('Digite a data de nascimento do cliente: '))
-            cliente = Cliente(name, endereco, rg, data_nascimento)
+            cliente = Cliente(nome, endereco, rg, data_nascimento)
             Clientes.append(cliente)
 
         elif cod == 2:
@@ -160,13 +177,14 @@ while True:
 
     #  Produto
     elif cod == 3:
+        print('------------------Menu Produtos------------------')
         print("1-Cadastrar um produto \n2-Visualizar um produto \n3-Alterar um produto \n4-Excluir um produto")
         cod = int(input("O que deseja fazer: "))
         if cod == 1:
-            codigo = str(input('Digite o codigo do produto: '))
-            name = str(input('Digite o name do produto: '))
-            valor = str(input('Digite o valor do produto: '))
-            produto = Produto(codigo, name, valor)
+            codigo = int(input('Digite o codigo do produto: '))
+            nome = str(input('Digite o nome do produto: '))
+            valor = float(input('Digite o valor do produto: '))
+            produto = Produto(codigo, nome, valor)
             Produtos.append(produto)
 
         elif cod == 2:
@@ -198,12 +216,59 @@ while True:
                 print("Não existe nenhum produto cadastrado com esse nome")
         else:
             print("Codigo invalido")
+
+    # Venda
     elif cod == 4:
-        print('cli')
-    elif cod == 5:
-        print('cli')
-    elif cod == 6:
-        print('cli')
+        print('------------------Menu Vendas------------------')
+        ItemVendas = []
+        print("1-Cadastrar uma venda \n2-Visualizar uma venda\n3-Alterar umavenda \n4-Excluir uma venda")
+        cod = int(input("O que deseja fazer: "))
+        if cod == 1:
+            numero = int(input('Digite o número da sua venda: '))
+            data = str(input('Digite a data da sua venda: '))
+            cliente = str(input('Digite o nome do seu cliente: '))
+            cod2 = 1
+            while cod2 != 0:
+                print('------------------Menu de itens------------------')
+                print("1-Adicionar item \n2-Visualizar itens adicionados \n4-Remover item \n0-Finalisar venda")
+                cod2 = int(input('O que deseja fazer: '))
+                if cod2 == 1:
+                    produto = str(input('Digite o nome do produto: '))
+                    quantidade = int(input('Digite a quantidade: '))
+                    for elem in Produtos:
+                        if elem.nome == produto:
+                            Item = ItemVenda(elem, quantidade)
+                            ItemVendas.append(Item)
+                elif cod2 == 2:
+                    for elem in ItemVendas:
+                        print(elem.produto.nome)
+                        print(elem.quantidade)
+                        print(elem.valor)
+            for elem in Clientes:
+                if elem.nome == cliente:
+                    venda = Venda(numero, data, elem, ItemVendas)
+                    Vendas.append(venda)
+
+        elif cod == 2:
+            for elem in Vendas:
+                print('---------------------')
+                print(elem.numero)
+                print(elem.data)
+                print(elem.cliente.nome)
+                print(elem.total)
+
+        elif cod == 3:
+            ind = str(input("Digite o número da venda que deseja excluir: "))
+            flag = 0
+            for elem in Vendas:
+                if elem.numero == ind:
+                    elem.remover_venda()
+                    flag = 1
+            if flag == 0:
+                print("Não existe nenhum produto cadastrado com esse nome")
+        else:
+            print("Codigo invalido")
+
     elif cod == 0:
         break
     else:
